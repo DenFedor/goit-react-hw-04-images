@@ -3,24 +3,24 @@ import PropTypes from 'prop-types';
 import { createPortal } from 'react-dom';
 import { OverlayWrap, ModalWrap, ModalImg } from './Modal.styled';
 const modalRoot = document.querySelector('#modal-root');
-export const Modal = ({img,tags,onClose}) => {
- useEffect(() => {
+export const Modal = ({ img, tags, onClose }) => {
+  useEffect(() => {
     const handleKeyDown = e => {
       if (e.code === 'Escape') {
         onClose();
       }
     };
-    document.addEventListener("keydown", handleKeyDown);
-    document.body.style.overflow='hidden';
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-      document.body.style.overflow='unset';
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
     };
   });
 
- const handleBackdropClick = e => {
+  const handleBackdropClick = e => {
     if (e.currentTarget === e.target) {
-    onClose();
+      onClose();
     }
   };
 
@@ -37,4 +37,5 @@ export const Modal = ({img,tags,onClose}) => {
 Modal.propTypes = {
   img: PropTypes.string.isRequired,
   tags: PropTypes.string.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
