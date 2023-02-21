@@ -6,13 +6,8 @@ import { Modal } from 'components/Modal/Modal';
 export const ImageGalleryItem=(props)=>{
   const [showModal,setModal]=useState(false);
   const onClickImageHandler = e => {
-        e.currentTarget.tagName === 'IMG' && toggleModal();
+        e.currentTarget.tagName === 'IMG' && setModal(true);
       };
-  const toggleModal = () => {
-    setModal(({ showModal }) => ({
-              showModal: !showModal,
-            }))
-          };
           return (
             <>
               <GalleryItem>
@@ -24,7 +19,7 @@ export const ImageGalleryItem=(props)=>{
               </GalleryItem>
               {showModal && (
                 <Modal
-                  onClose={toggleModal}
+                  onClose={()=>setModal(false)}
                   img={props.largeImage}
                   tags={props.tag}
                 />
