@@ -1,10 +1,10 @@
 import { Container } from './App.styled';
-import Searchbar from './Searchbar/Searchbar';
+import { Searchbar } from './Searchbar/Searchbar';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import { Loader } from './Loader/Loader';
 import { LoadButton } from './Button/Button';
-import React, { Component } from 'react';
+import React,{Component} from 'react';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 
 const API_KEY = '31235153-11b91783de2de8bcbb11dc69c';
@@ -25,6 +25,81 @@ async function fetchImages(query, page) {
 
   return response.data;
 }
+// export const App = () => {
+//   const [images, setImages] = useState([]);
+//   const [q, setQ] = useState('');
+//   const [loading, setLoading] = useState(false);
+//   const [page, setPage] = useState(1);
+//   const [totalPages, setTotalPages] = useState(0);  
+//   useEffect(
+//     prevState => {
+//       if (prevState.q !== q || prevState.page !== page) {
+//         setLoading(true);
+//         try {
+//           const images = fetchImages(q, page);
+//           if (images.hits.length > 0) {
+//             setImages(prevState => {
+//               return [...prevState.images, ...images.hits];
+//             });
+//             setTotalPages(Math.ceil(images.totalHits / 12));
+//           } else {
+//             toast("We couldn't find anything. Try something else.");
+//             return;
+//           }
+//         } catch (error) {
+//           console.log(error);
+//         } finally {
+//           setLoading(false);
+//         }
+//       }
+//     },
+//     [q, page]
+//   );
+
+//   const loadMore = () => {
+//     setPage(prevState => prevState + 1);
+//     setLoading(true);
+//   };
+//   const submitHandler = data => {
+//     if (q !== data.q) {
+//       setQ(data.q);
+//       setImages([]);
+//       setPage(1);
+//     }
+//   };
+
+//   return (
+//     <>
+//       <Container>
+//         <Searchbar onSubmit={submitHandler} />
+//         {loading && <Loader onLoading={loading} />}
+//       </Container>
+//       {images.length > 0 && (
+//         <Container>
+//           <ImageGallery responseData={images} />
+//           {loading ? (
+//             <Loader onLoading={loading} />
+//           ) : (
+//             totalPages > 1 &&
+//             totalPages !== page && <LoadButton onClick={loadMore} />
+//           )}
+//         </Container>
+//       )}
+//       <ToastContainer
+//         position="top-right"
+//         autoClose={3000}
+//         hideProgressBar={false}
+//         newestOnTop={false}
+//         closeOnClick
+//         rtl={false}
+//         pauseOnFocusLoss
+//         draggable
+//         pauseOnHover
+//         theme="light"
+//       />
+//     </>
+//   );
+// };
 
 class App extends Component {
   state = {
@@ -34,72 +109,72 @@ class App extends Component {
     page: 1,
     totalPages: 0,
   };
-  async componentDidUpdate(prevProps, prevState) {
-    if (prevState.q !== this.state.q || prevState.page !== this.state.page) {
-      this.setState({ loading: true });
-      try {
-        const images = await fetchImages(this.state.q, this.state.page);
-        if (images.hits.length > 0) {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...images.hits],
-            totalPages: Math.ceil(images.totalHits / 12),
-          }));
-        } else {
-          toast("We couldn't find anything. Try something else.");
-          return;
-        }
-      } catch (error) {
-        console.log(error);
-      } finally {
-        this.setState({ loading: false });
+async componentDidUpdate(prevProps, prevState) {
+  if (prevState.q !== this.state.q || prevState.page !== this.state.page) {
+    this.setState({ loading: true });
+    try {
+      const images = await fetchImages(this.state.q, this.state.page);
+      if (images.hits.length > 0) {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...images.hits],
+          totalPages: Math.ceil(images.totalHits / 12),
+        }));
+      } else {
+        toast("We couldn't find anything. Try something else.");
+        return;
       }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      this.setState({ loading: false });
     }
   }
-  loadMore = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-      loading: true,
-    }));
-  };
-  submitHandler = data => {
-    if (this.state.q !== data.q) {
-      this.setState({ q: data.q, images: [], page: 1 });
-    }
-  };
+}
+loadMore = () => {
+  this.setState(prevState => ({
+    page: prevState.page + 1,
+    loading: true,
+  }));
+};
+submitHandler = data => {
+  if (this.state.q !== data.q) {
+    this.setState({ q: data.q, images: [], page: 1 });
+  }
+};
 
   render() {
-    const { images, loading, totalPages, page } = this.state;
-    return (
-      <>
+  const { images, loading, totalPages, page } = this.state;
+  return (
+    <>
+      <Container>
+        <Searchbar onSubmit={this.submitHandler} />
+        {loading && <Loader onLoading={loading} />}
+      </Container>
+      {images.length > 0 && (
         <Container>
-          <Searchbar onSubmit={this.submitHandler} />
-          {loading && <Loader onLoading={loading} />}
+          <ImageGallery responseData={images} />
+          {loading ? (
+            <Loader onLoading={loading} />
+          ) : (
+            totalPages > 1 &&
+            totalPages !== page && <LoadButton onClick={this.loadMore} />
+          )}
         </Container>
-        {images.length > 0 && (
-          <Container>
-            <ImageGallery responseData={images} />
-            {loading ? (
-              <Loader onLoading={loading} />
-            ) : (
-              totalPages > 1 &&
-              totalPages !== page && <LoadButton onClick={this.loadMore} />
-            )}
-          </Container>
-        )}
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
-      </>
-    );
-  }
+      )}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </>
+  );
+}
 }
 export default App;
